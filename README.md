@@ -1,6 +1,7 @@
-Dekrispator version 2
+Dekrispator version 2 - note_on_note_off fork
 ===========
 
+Xavier originally said:
 This is a rewriting of the old Dekrispator but there is no new feature at the moment.
 I've used the new STM32Cube library from ST (v1.3) with new HAL and USB host stack.
 I've written a new USB host MIDI class driver which should accept more devices.
@@ -11,19 +12,22 @@ The sound demos are here : https://soundcloud.com/bluexav
 
 A video is here : http://youtu.be/fcLrcDCaI7w
 
+I have modified the code slightly to handle MIDI note on/note off messages so that the synth can be played from a MIDI keyboard or driven by an external sequencer.
+Note that Xavier did all the hard work!
 - - - -
 
 **Usage**
 
 Flash your board with "Dekrispator_v2.hex" (in Release folder) and enjoy hours and hours of sweet music coming of it ! Sounds can be loud so beware !
 
-When powering up the board, the synth starts in "demo mode" unless you press and maintain a little the user button before power. In that case the synth enters "user mode".
+When powering up the board, the synth starts in "USB mode" unless you press and maintain a little the user button before power. In that case the synth enters "demo mode".
 
-*Demo mode* : The synth works on its own, sounds are perpetually changing. If you press the user button, sounds and effects stop always changing and the red LED lights on : the synth parameters are frozen. Press once again the user button and the red LED lights off : unfreeze.
+*User mode* : Connect an USB MIDI keyboard/controller (like Arturia Keystep...) to the board's micro USB connector and control the synth.
+The MIDI mapping of the synth controls are in MIDI_mapping.ods file. The blue LED indicates midi activity. The green LED indicates USB mode.
+In addition to basic note on/note off, velocity controls note volume and a modulation wheel controls vibrato depth.
+Pressing the user button enables/disables the built-in sequencer. The red LED indicates the built-in sequencer is running.
 
-*User mode* : Connect an USB MIDI controller (like Korg NanoKontrol...) to the board's micro USB connector and control the synth.
-The MIDI mapping of the synth controls are in MIDI_mapping.ods file. I nearly used the factory settings of Korg NanoKontrol V1 (some momentary/toggle buttons modified). The blue LED indicates midi activity.
-
+*Demo mode* : Demo mode is currently a bit broken. The sound doesn't change and pressing the user button starts and stops the sequencer. At least it works with a keyboard though!
 
 The orange LED reflects the CPU usage : when it's dim CPU gets overloaded.
 
