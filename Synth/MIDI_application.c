@@ -10,7 +10,7 @@
 
 //#include "main.h"
 #include "MIDI_application.h"
-
+#include "adsr.h"
 
 
 
@@ -18,6 +18,10 @@
 
 #define RX_BUFF_SIZE   64  /* Max Received data 64 bytes */
 
+uint8_t note;
+uint8_t velocity;
+extern ADSR_t 			adsr;
+extern bool				sequencer;
 
 uint8_t MIDI_RX_Buffer[RX_BUFF_SIZE]; // MIDI reception buffer
 
@@ -79,7 +83,7 @@ void MagicFX(uint8_t val) /* random effects parameters */
 /*-----------------------------------------------------------------------------*/
 void MagicPatch(uint8_t val) /* random sound parameters */
 {
-	if (val == MIDI_MAXi)
+	if (val > MIDI_MID_i)
 	{
 		seq_tempo_set(MIDIrandVal());
 		seq_freqMax_set(MIDIrandVal());
@@ -147,6 +151,17 @@ void ProcessReceivedMidiDatas(void)
 	uint16_t numberOfPackets;
 	uint8_t *ptr = MIDI_RX_Buffer;
 	midi_package_t pack;
+	static uint8_t notesOn[128] = {0};
+	static int8_t notesCount = 0;
+
+	if (notesCount < 0)
+	{
+		BSP_LED_On(LED_Red);
+	}
+	else
+	{
+		BSP_LED_Off(LED_Red);
+	}
 
 	numberOfPackets = USBH_MIDI_GetLastReceivedDataSize(&hUSBHost) / 4; //each USB midi package is 4 bytes long
 	if (numberOfPackets != 0) // seems useless...
@@ -162,12 +177,83 @@ void ProcessReceivedMidiDatas(void)
 
 			if(pack.cin_cable != 0) start_LED_On(LED_Blue, 8);
 
+			if (sequencer == false)
+			{
+				if ((pack.evnt0 & 0xF0) == 0x80) // Note off
+				{
+					uint8_t noteOff = pack.evnt1;
+					if (notesOn[noteOff] == 1)
+					{
+						notesOn[noteOff] = 0;
+						if (--notesCount <= 0)
+						{
+							ADSR_keyOff(&adsr);
+						}
+						else
+						{
+							for (uint8_t i = 0; i < 128; i++)
+							{
+								if (notesOn[i] == 1)
+									note = i - 21;
+							}
+						}
+					}
+				}
+				else if ((pack.evnt0 & 0xF0) == 0x90) // Note on
+				{
+					uint8_t noteOn = pack.evnt1;
+					velocity = pack.evnt2;
+					if (velocity > 0)
+					{
+						if (noteOn < 21)
+						{
+							note = 0;
+						}
+						else
+						{
+							note = noteOn - 21;
+						}
+						notesCount++;
+						notesOn[noteOn] = 1;
+						ADSR_keyOn(&adsr);
+					}
+					else
+					{
+						//Note off
+						if (notesOn[noteOn] == 1)
+						{
+							notesOn[noteOn] = 0;
+							if (--notesCount <= 0)
+							{
+								ADSR_keyOff(&adsr);
+							}
+							else
+							{
+								for (uint8_t i = 0; i < 128; i++)
+								{
+									if (notesOn[i] == 1)
+										note = i - 21;
+								}
+							}
+						}
+					}
+				}
+				else if ((pack.evnt0 & 0xF0) == 0xA0) // Aftertouch
+				{
+					// Filter1Res_set(pack.evnt2);
+				}
+				else if ((pack.evnt0 & 0xF0) == 0xE0) // Pitch Bend
+				{
+					// int16_t pitchBend = ((pack.evnt1 << 7) + pack.evnt2) - 0x2000;
+				}
+			}
 			if ((pack.evnt0 & 0xF0) == 0xB0) /* If the midi message is a Control Change... */
 			{
 				uint8_t val = pack.evnt2;
 
 				switch(pack.evnt1) // CC number
 				{
+				case 1  :   VibratoAmp_set(val);		break;  // modulation wheel
 				case 3 	: 	seq_tempo_set(val); 		break ;	// tempo
 				case 13 : 	Volume_set(val); 			break;	// master volume
 				case 31 :	SynthOut_switch(val); 		break;  // toggle synth output

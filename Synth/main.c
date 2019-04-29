@@ -38,8 +38,9 @@ USBH_HandleTypeDef hUSBHost; /* USB Host handle */
 
 MIDI_ApplicationTypeDef Appli_state = APPLICATION_IDLE;
 
-bool	demoMode = true;
+bool	demoMode = false;
 bool	freeze = false;
+bool	sequencer = false;
 
 /*---------------------------------------------------------------------------*/
 static void  SystemClock_Config(void);
@@ -49,15 +50,31 @@ static void  USBH_UserProcess_callback  (USBH_HandleTypeDef *pHost, uint8_t vId)
 
 void ButtonPressed_action(void)
 {
-	if (freeze == false)
+	if (demoMode == true)
 	{
-		freeze = true;
-		BSP_LED_On(LED_Red);
+		if (freeze == false)
+		{
+			freeze = true;
+			BSP_LED_On(LED_Blue);
+		}
+		else
+		{
+			freeze = false;
+			BSP_LED_Off(LED_Blue);
+		}
 	}
 	else
 	{
-		freeze = false;
-		BSP_LED_Off(LED_Red);
+		if (sequencer == false)
+		{
+			sequencer = true;
+			BSP_LED_On(LED_Red);
+		}
+		else
+		{
+			sequencer = false;
+			BSP_LED_Off(LED_Red);
+		}
 	}
 }
 /*----------------------------------------------------------------------------*/
@@ -94,7 +111,14 @@ int main(void)
 
 	/* Choose demo or user mode --------------------------*/
 	if(BSP_PB_GetState(BUTTON_KEY)) // press or not user button before and during startup to choose user or demo mode
-	{	// normal user mode, with USB (button pressed)
+	{	// demo mode, no USB, no interaction, automatic working
+		demoMode = true;
+		sequencer = true;
+		freeze = false;
+		while (1);
+	}
+	else
+	{	// normal user mode, with USB
 		demoMode = false;
 		freeze = false;
 
@@ -117,12 +141,6 @@ int main(void)
 			USBH_Process(&hUSBHost);
 
 		}
-	}
-	else
-	{	// demo mode, no USB, no interaction, automatic working
-		demoMode = true;
-		freeze = false;
-		while (1);
 	}
 }
 /*====================================================================================================*/

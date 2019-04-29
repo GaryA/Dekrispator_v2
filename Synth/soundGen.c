@@ -36,6 +36,7 @@
 
 extern bool					demoMode;
 extern bool					freeze;
+extern bool					sequencer;
 
 extern Sequencer_t 			seq;
 extern NoteGenerator_t 		noteG;
@@ -59,7 +60,9 @@ extern ResonantFilter 	SVFilter2;
 extern float			filterFreq  ;
 extern float			filterFreq2  ;
 
-extern ADSR_t 			adsr;
+extern uint8_t			note;
+extern uint8_t			velocity;
+extern ADSR_t			adsr;
 
 /*--------------------------------------------------------------*/
 
@@ -126,8 +129,10 @@ void Synth_reset(uint8_t val)
 {
 	if (val == MIDI_MAXi)
 	{
-		demoMode = false;
+		// GRA
+		// demoMode = false;
 		freeze = false;
+		sequencer = false;
 		Synth_Init();
 	}
 }
@@ -437,7 +442,7 @@ Synth_Init(void)
 
 	vol = env = 1;
 	sound = MORPH_SAW;
-	autoFilterON = false;
+	autoFilterON = true;
 	autoSound = 0;
 	chorusON = false;
 	delayON = false;
@@ -541,8 +546,16 @@ void make_sound(uint16_t *buf , uint16_t length) // To be used with the Sequence
 	for (pos = 0; pos < length; pos++)
 	{
 		/*--- Sequencer actions and update ---*/
-		sequencer_process(); //computes f0 and calls sequencer_newStep_action() and sequencer_newSequence_action()
-
+		// GRA
+		if (sequencer == true || demoMode == true)
+		{
+			sequencer_process(); //computes f0 and calls sequencer_newStep_action() and sequencer_newSequence_action()
+		}
+		else
+		{
+			f0 = notesFreq[note];
+			vol = (float)velocity / 127.0f;
+		}
 		/*--- compute vibrato modulation ---*/
 		f1 = f0 * (1 +  Osc_WT_SINE_SampleCompute(&vibr_lfo));
 
@@ -552,8 +565,11 @@ void make_sound(uint16_t *buf , uint16_t length) // To be used with the Sequence
 		/*--- Apply envelop and tremolo ---*/
 		env = ADSR_computeSample(&adsr) * (1 + Osc_WT_SINE_SampleCompute(&amp_lfo));
 		y *= vol * env; // apply volume and envelop
-		if (adsr.cnt_ >= seq.gateTime) ADSR_keyOff(&adsr);
-
+		// GRA
+		if (sequencer == true)
+		{
+			if (adsr.cnt_ >= seq.gateTime) ADSR_keyOff(&adsr);
+		}
 		/*--- Apply filter effect ---*/
 		/* Update the filters cutoff frequencies */
 		if ((! autoFilterON)&&(filt_lfo.amp != 0))

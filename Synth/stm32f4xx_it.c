@@ -48,7 +48,8 @@ extern I2S_HandleTypeDef      	hAudioInI2s;
 __IO uint32_t 					TimeRecBase = 0;  /* Time Recording base variable */
 
 extern HCD_HandleTypeDef 		hHCD;
-extern bool						demoMode;
+// GRA
+// extern bool						demoMode;
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
@@ -155,7 +156,7 @@ void SysTick_Handler(void)
 
 	TimingDelay_Decrement();
 	update_temporized_LED(LED_Blue);
-	if (demoMode == true) DebounceUserButton();
+	DebounceUserButton();
 
 
 }

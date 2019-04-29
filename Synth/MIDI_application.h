@@ -42,6 +42,9 @@ MIDI_ApplicationTypeDef;
 
 extern USBH_HandleTypeDef hUSBHost;
 extern MIDI_ApplicationTypeDef Appli_state;
+// GRA
+extern uint8_t note;
+extern uint8_t velocity;
 
 /* Exported functions ------------------------------------------------------- */
 

@@ -33,7 +33,6 @@ C_SRCS += \
 ../drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_irda.c \
 ../drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.c \
 ../drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_ltdc.c \
-../drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_msp_template.c \
 ../drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nand.c \
 ../drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nor.c \
 ../drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pccard.c \
@@ -92,7 +91,6 @@ OBJS += \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_irda.o \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.o \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_ltdc.o \
-./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_msp_template.o \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nand.o \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nor.o \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pccard.o \
@@ -151,7 +149,6 @@ C_DEPS += \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_irda.d \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_iwdg.d \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_ltdc.d \
-./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_msp_template.d \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nand.d \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_nor.d \
 ./drivers/STM32F4xx_HAL_Driver/Src/stm32f4xx_hal_pccard.d \
@@ -185,7 +182,7 @@ C_DEPS += \
 drivers/STM32F4xx_HAL_Driver/Src/%.o: ../drivers/STM32F4xx_HAL_Driver/Src/%.c
 	@echo 'Building file: $<'
 	@echo 'Invoking: Cross ARM C Compiler'
-	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O3 -ffunction-sections -fdata-sections -fsingle-precision-constant -flto -Wunused -Wuninitialized -Wall -Wconversion -Wshadow -Wfloat-equal -D__FPU_USED=1 -DHSE_VALUE=8000000 -DUSE_HAL_DRIVER -DUSE_STM32F4_DISCO -DSTM32F407xx -I.././drivers/STM32_USB_Host_Library/Core/Inc -I../drivers/BSP -I../drivers/cmsis -I../drivers/STM32F4xx_HAL_Driver/Inc -I../Synth -I../drivers/USBH_midi_class/Inc -std=c11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
+	arm-none-eabi-gcc -mcpu=cortex-m4 -mthumb -mfloat-abi=hard -mfpu=fpv4-sp-d16 -O3 -fmessage-length=0 -fsigned-char -ffunction-sections -fdata-sections -fsingle-precision-constant -Wall  -g -D__FPU_USED -DHSE_VALUE=8000000 -DUSE_HAL_DRIVER -DUSE_STM32F4_DISCO -DSTM32F407xx -I"Y:\Dekrispator_v2\drivers\BSP" -I"Y:\Dekrispator_v2\drivers\cmsis" -I"Y:\Dekrispator_v2\drivers\STM32_USB_Host_Library\Core\Inc" -I"Y:\Dekrispator_v2\drivers\STM32F4xx_HAL_Driver\Inc" -I"Y:\Dekrispator_v2\drivers\USBH_midi_class\Inc" -I"Y:\Dekrispator_v2\Synth" -std=gnu11 -MMD -MP -MF"$(@:%.o=%.d)" -MT"$(@)" -c -o "$@" "$<"
 	@echo 'Finished building: $<'
 	@echo ' '
 
